@@ -191,10 +191,78 @@ for (fname, elty) in ((:psgemm_, :Float32),
     end
 end
 
+# void 	pcgemv_ (F_CHAR_T TRANS, 
+#                  Int *M, Int *N, 
+#                  float *ALPHA, float *A, Int *IA, Int *JA, Int *DESCA, 
+#                  float *X, Int *IX, Int *JX, Int *DESCX, Int *INCX, 
+#                  float *BETA, 
+#                  float *Y, Int *IY, Int *JY, Int *DESCY, Int *INCY)
+
+for (fname, elty) in ((:psgemv_, :Float32),
+                      (:pdgemv_, :Float64),
+                      (:pcgemv_, :ComplexF32),
+                      (:pzgemv_, :ComplexF64))
+    @eval begin
+        function pXgemv!(trans::Char,
+                         m::ScaInt, n::ScaInt,
+                         α::$elty,
+                         A::Matrix{$elty}, ia::ScaInt, ja::ScaInt, desca::Vector{ScaInt},
+                         X::Vector{$elty}, ix::ScaInt, jx::ScaInt, descx::Vector{ScaInt}, incx::ScaInt,
+                         β::$elty,
+                         Y::Vector{$elty}, iy::ScaInt, jy::ScaInt, descy::Vector{ScaInt}, incy::ScaInt)
+
+            ccall(($(string(fname)), libscalapack), Nothing,
+                (Ptr{Char},
+                 Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}), 
+                 f_pchar(trans),
+                 Ref(m), Ref(n),
+                 Ref(α),
+                 A, Ref(ia), Ref(ja), desca, 
+                 X, Ref(ix), Ref(jx), descx, Ref(incx),
+                 Ref(β),
+                 Y, Ref(iy), Ref(jy), descy, Ref(incy))
+        end
+    end
+end
+
+# SUBROUTINE PvGER( M, N, ALPHA, X, IX, JX, DESCX, INCX, Y, IY, JY, DESCY, INCY, A, IA, JA, DESCA )
+for (fname, elty) in ((:psger_, :Float32),
+                      (:pdger_, :Float64),
+                      (:pcger_, :ComplexF32),
+                      (:pzger_, :ComplexF64))
+    @eval begin
+        function pXger!( m::ScaInt, n::ScaInt,
+                         α::$elty,
+                         X::Vector{$elty}, ix::ScaInt, jx::ScaInt, descx::Vector{ScaInt}, incx::ScaInt,
+                         Y::Vector{$elty}, iy::ScaInt, jy::ScaInt, descy::Vector{ScaInt}, incy::ScaInt,
+                         A::Matrix{$elty}, ia::ScaInt, ja::ScaInt, desca::Vector{ScaInt},)
+            ccall(($(string(fname)), libscalapack), Nothing,
+                (Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt},
+                 Ptr{$elty}, Ptr{ScaInt}, Ptr{ScaInt}, Ptr{ScaInt}), 
+                 Ref(m), Ref(n),
+                 Ref(α),
+                 X, Ref(ix), Ref(jx), descx, Ref(incx),
+                 Y, Ref(iy), Ref(jy), descy, Ref(incy),
+                 A, Ref(ia), Ref(ja), desca)
+        end
+    end
+end
+
+
+
+
 #
 for (fname, elty) in ((:pslaset_, :Float32),
-                      (:pclaset_, :Float64),
-                      (:pdlaset_, :ComplexF32),
+                      (:pdlaset_, :Float64),
+                      (:pclaset_, :ComplexF32),
                       (:pzlaset_, :ComplexF64))
     @eval begin
         function pXlaset!(uplo::Char, m::ScaInt, n::ScaInt,
