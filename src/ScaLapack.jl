@@ -8,6 +8,7 @@ module ScaLapack
 
     # blacs wrapper
     module BLACS
+        using MPI
         import ..libscalapack, ..ScaInt, ..f_pchar
         include("blacs.jl")
     end

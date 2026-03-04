@@ -100,3 +100,6 @@ gridexit(icontxt::ScaInt) = ccall((:blacs_gridexit_, libscalapack), Nothing, (Pt
 # input : BLACS flag whether continue message passing or not after done
 # output: nothing
 exit(continue_::ScaInt = 0) = ccall((:blacs_exit_, libscalapack), Nothing, (Ptr{ScaInt},), Ref(continue_))
+
+comm2blacs(comm::MPI.Comm) = ccall((:Csys2blacs_handle, libscalapack), ScaInt, (MPI.Comm,), comm)
+
