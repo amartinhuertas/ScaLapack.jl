@@ -101,5 +101,5 @@ gridexit(icontxt::ScaInt) = ccall((:blacs_gridexit_, libscalapack), Nothing, (Pt
 # output: nothing
 exit(continue_::ScaInt = 0) = ccall((:blacs_exit_, libscalapack), Nothing, (Ptr{ScaInt},), Ref(continue_))
 
-comm2blacs(comm::MPI.Comm) = ccall((:Csys2blacs_handle, libscalapack), ScaInt, (MPI.Comm,), comm)
+comm2blacs(comm::Cint) = ccall((:sys2blacs_handle_, libscalapack), ScaInt, (Ptr{Cint},), Ref(comm))
 
