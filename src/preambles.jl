@@ -14,8 +14,8 @@ f_pstring(scope::String) = transcode(UInt8, string(scope))
 # path to scalapack dynamic library
 const libscalapack = "/home/u1134396/software_installers/scalapack-2.2.2/lib/libscalapack.so"
 # depend on envionment
-# const ScaInt = Int32
-const ScaInt = Int64
+const ScaInt = Int32
+# const ScaInt = Int64
 const zero = convert(ScaInt, 0)
 const one = convert(ScaInt, 1)
 
